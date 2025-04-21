@@ -3,7 +3,7 @@ from typing import List, Tuple
 
 class AIModel:
     def __init__(self):
-        # Model Loading Part here
+        # Model Loading Part here Load PRevious Saves for Transfer Learning
         pass
 
     def learn(self, data: List[Tuple]) -> None:
