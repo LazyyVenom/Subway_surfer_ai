@@ -11,5 +11,5 @@ LESSS GOOOOOOOOO
 
 
 Plan:
-- [] Train Yolo Model for Obstacles Tracking
+- [*] Train Yolo Model for Obstacles Tracking
 - [] Identify Score (OCR will do) Or Lets Track time thats better
