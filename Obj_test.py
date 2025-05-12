@@ -13,7 +13,7 @@ while True:
     screen_shot = sct.grab(monitor)
     
     frame = np.array(screen_shot)
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)  # Drop alpha channel
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
 
     results = model(frame, verbose=False)
 
