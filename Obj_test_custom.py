@@ -33,7 +33,7 @@ while True:
 
 
         if y2 > 380 and "Obs" in class_name:
-            print(f"{class_name.replace("Obs_","")}, Lower Y (y2): {y2}")
+            print(f"{class_name.replace('Obs_','')}, Lower Y (y2): {y2}")
 
         (text_w, text_h), baseline = cv2.getTextSize(class_name, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
         cv2.rectangle(frame, (x1, y1 - text_h - 6), (x1 + text_w + 4, y1), (0, 0, 0), -1)
