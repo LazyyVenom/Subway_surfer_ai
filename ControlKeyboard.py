@@ -1,4 +1,5 @@
 #Imports Here
+import pyautogui
 from typing import List
 
 class ControlKeyboard:
@@ -6,7 +7,6 @@ class ControlKeyboard:
         # Model Loading Part here
         pass
 
-    def control_keyboard(self, image) -> List[tuple]:
-        # Implement keyboard control logic here
-        # This is a placeholder implementation
+    def control_keyboard(self, key) -> List[tuple]:
+        pyautogui.press(key)
         pass
