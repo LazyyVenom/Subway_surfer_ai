@@ -3,9 +3,9 @@ import numpy as np
 from ultralytics import YOLO
 import mss
 
-model = YOLO('models\YoloV8\V3.pt')
+model = YOLO('models\YoloV8\V4.pt')
 
-monitor = {"top": 0, "left": 0, "width": 1280, "height": 720}
+monitor = {"top": 100, "left": 0, "width": 900, "height": 900}
 
 sct = mss.mss()
 
