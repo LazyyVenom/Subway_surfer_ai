@@ -103,6 +103,30 @@ while True:
             measured_angle = math.degrees(math.atan2(y_distance, x_distance))
             if -80 > measured_angle > -100 and distance < 180:
                 print(f"Class: {class_name}, Angle: {measured_angle}, Distance: {distance}")
+                
+                # Draw a line between character and obstacle
+                char_center = (char_x_avg, char_details["y1"])
+                obstacle_center = (obs_x_avg, y1_avg)
+                
+                # Use different colors based on object type
+                if "Train" in class_name:
+                    line_color = (0, 0, 255)  # Red for trains
+                elif class_name == "Obs_High":
+                    line_color = (255, 0, 0)  # Blue for high obstacles
+                elif class_name == "Obs_Low":
+                    line_color = (0, 255, 255)  # Yellow for low obstacles
+                else:
+                    line_color = (255, 0, 255)  # Magenta for other obstacles
+                
+                # Draw the line with thickness proportional to proximity (closer = thicker)
+                line_thickness = max(1, min(5, int(180 / distance * 2)))
+                cv2.line(display_frame, char_center, obstacle_center, line_color, line_thickness)
+                
+                # Display distance and angle information next to the line
+                text_pos = ((char_center[0] + obstacle_center[0]) // 2, 
+                           (char_center[1] + obstacle_center[1]) // 2 - 10)
+                cv2.putText(display_frame, f"{distance:.1f}", text_pos, 
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, line_color, 1)
 
                 if "Train" in class_name:
                     if current_lane == 0:
