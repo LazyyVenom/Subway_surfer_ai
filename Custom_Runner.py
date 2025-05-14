@@ -21,6 +21,7 @@ while True:
     frame = np.array(screen_shot)
     frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
     results = model(frame, verbose=False)
+    frame = results[0].plot()
     boxes = results[0].boxes
     total_obstacles = []
 
@@ -75,24 +76,40 @@ while True:
             distance = math.sqrt(x_distance**2 + y_distance**2)
             
             measured_angle = math.degrees(math.atan2(y_distance, x_distance))
-            if -80 > measured_angle > -100 and distance < 170:
+            if -80 > measured_angle > -100 and distance < 180:
                 print(f"Class: {class_name}, Angle: {measured_angle}, Distance: {distance}")
 
                 if "Train" in class_name:
                     if current_lane == 0:
                         pyautogui.press("right")
+                        print("Pressed right")
                     elif current_lane == 2:
                         pyautogui.press("left")
+                        print("Pressed left")
                     else:
-                        pyautogui.press("left")
+                        random_choice = np.random.choice(["left", "right"])
+                        print(f"Choice: {random_choice}")
+                        # pyautogui.press(random_choice)
+                        if random_choice == "left":
+                            pyautogui.press("left")
+                        else:
+                            pyautogui.press("right")
+                        # pyautogui.press("left")
                 
-                else:
+                elif distance < 160:
                     if class_name == "Obs_High":
                         pyautogui.press("down")
+                        print("Pressed down")
                     elif class_name == "Obs_Low":
                         pyautogui.press("up")
+                        print("Pressed up")
                     else:
-                        pyautogui.press("up")
+                        random_choice = np.random.choice(["down", "up"])
+                        print(f"Choice: {random_choice}")
+                        if random_choice == "down":
+                            pyautogui.press("down")
+                        else:
+                            pyautogui.press("up")
 
             # print(f"Angle: {measured_angle}, Distance: {math.sqrt(x_distance**2 + y_distance**2)}")
 
