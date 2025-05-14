@@ -6,32 +6,56 @@ import math
 import time
 import pyautogui
 
+# Configuration parameters
 model = YOLO('models/YoloV8/V5.pt')
 names = model.names
 monitor = {"top": 200, "left": 30, "width": 850, "height": 620}
 middle_lane_room = 20
+
+# Keep only relevant configuration
+CHARACTER_LOST_TIMEOUT = 5.0
+
+# Performance tracking
+fps_start_time = time.time()
+fps_counter = 0
+fps = 0
 
 sct = mss.mss()
 cap = cv2.VideoCapture("videos\\final1.mp4")
 current_lane = 1
 character_last_seen = time.time()
 
+char_details = {
+    "x1": 0, "y1": 0, "x2": 0, "y2": 0,
+    "character_here": False
+}
+
 while True:
+    # Capture screen
     screen_shot = sct.grab(monitor)
     frame = np.array(screen_shot)
     frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+    
+    display_frame = frame.copy()
+    
+    char_details["character_here"] = False
+    
+    # Apply YOLO detection
     results = model(frame, verbose=False)
-    frame = results[0].plot()
+    
+    # Update FPS counter
+    fps_counter += 1
+    if (time.time() - fps_start_time) > 1.0:
+        fps = fps_counter / (time.time() - fps_start_time)
+        fps_counter = 0
+        fps_start_time = time.time()
+    
+    display_frame = results[0].plot()
     boxes = results[0].boxes
-    total_obstacles = []
-
-    char_details = {
-        "x1": 0,
-        "y1": 0,
-        "x2": 0,
-        "y2": 0,
-        "character_here": False
-    }
+    
+    cv2.putText(display_frame, f"FPS: {fps:.1f}", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    
+    # Character detection logic
     for box, class_id in zip(boxes.xyxy, boxes.cls):
         class_id = int(class_id)
         class_name = names[class_id]
@@ -59,11 +83,12 @@ while True:
 
             current_lane = lane
 
+    # Obstacle detection and avoidance logic
     for box, class_id in zip(boxes.xyxy, boxes.cls):
         class_id = int(class_id)
         class_name = names[class_id]
         x1, y1, x2, y2 = map(int, box)
-
+        
         if "Train" in class_name or "Obs" in class_name:
             x1_avg = (x1 + x2) // 2
             y1_avg = (y1 + y2) // 2
@@ -89,12 +114,10 @@ while True:
                     else:
                         random_choice = np.random.choice(["left", "right"])
                         print(f"Choice: {random_choice}")
-                        # pyautogui.press(random_choice)
                         if random_choice == "left":
                             pyautogui.press("left")
                         else:
                             pyautogui.press("right")
-                        # pyautogui.press("left")
                 
                 elif distance < 160:
                     if class_name == "Obs_High":
@@ -111,9 +134,19 @@ while True:
                         else:
                             pyautogui.press("up")
 
-            # print(f"Angle: {measured_angle}, Distance: {math.sqrt(x_distance**2 + y_distance**2)}")
+    # Check if character is lost
+    if not char_details["character_here"] and time.time() - character_last_seen > CHARACTER_LOST_TIMEOUT:
+        text = "I Lost Sorry :("
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 1.5
+        color = (0, 0, 255)
+        thickness = 3
+        text_size = cv2.getTextSize(text, font, font_scale, thickness)[0]
+        text_x = (display_frame.shape[1] - text_size[0]) // 2
+        text_y = (display_frame.shape[0] + text_size[1]) // 2
+        cv2.putText(display_frame, text, (text_x, text_y), font, font_scale, color, thickness, cv2.LINE_AA)
 
-    cv2.imshow("YOLOv8 Video Detection", frame)
+    cv2.imshow("YOLOv8 Video Detection", display_frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
